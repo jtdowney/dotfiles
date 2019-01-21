@@ -1,0 +1,118 @@
+call plug#begin('~/.vim/plugged')
+
+Plug 'SirVer/ultisnips'
+Plug 'benmills/vimux'
+Plug 'cespare/vim-toml'
+Plug 'digitaltoad/vim-pug'
+Plug 'honza/vim-snippets'
+Plug 'janko-m/vim-test'
+Plug 'jlanzarotta/bufexplorer'
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+Plug 'leafgarland/typescript-vim'
+Plug 'mileszs/ack.vim'
+Plug 'nanotech/jellybeans.vim'
+Plug 'osyo-manga/vim-over'
+Plug 'pangloss/vim-javascript'
+Plug 'posva/vim-vue'
+Plug 'rust-lang/rust.vim'
+Plug 'scrooloose/nerdtree'
+Plug 'slim-template/vim-slim'
+Plug 'sovetnik/vim-hanami'
+Plug 'tpope/vim-bundler'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-markdown'
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-vinegar'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'vim-ruby/vim-ruby'
+Plug 'vim-scripts/Align'
+Plug 'w0rp/ale'
+
+call plug#end()
+
+syntax on
+filetype plugin indent on
+
+set encoding=utf8
+set hlsearch
+set number
+set showmatch
+set incsearch
+set background=dark
+set hidden
+set backspace=indent,eol,start
+set directory=/tmp//
+set ruler
+set wrap
+set scrolloff=5
+set textwidth=0 nosmartindent tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+set ignorecase
+set smartcase
+set wildignore+=*.pyc,*.o,*.class
+set nofoldenable
+set path+=**
+set wildmenu
+
+if &t_Co == 256
+  try
+    colorscheme jellybeans
+  catch /^Vim\%((\a\+)\)\=:E185/
+    colorscheme slate
+  endtry
+endif
+
+autocmd BufNewFile,BufRead *.txt setlocal spell spelllang=en_us
+autocmd FileType tex setlocal spell spelllang=en_us
+autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd BufRead,InsertLeave * match ExtraWhitespace /\s\+$/
+
+autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
+highlight ExtraWhitespace ctermbg=red guibg=red
+
+if executable('ag')
+	let g:ackprg = 'ag --vimgrep'
+endif
+
+let mapleader=" "
+let maplocalleader = ","
+let g:airline#extensions#ale#enabled = 1
+let g:airline_symbols_ascii = 1
+let g:VimuxHeight = '30'
+let g:VimuxOrientation = 'h'
+let test#strategy = "vimux"
+let $FZF_DEFAULT_COMMAND = 'find * -type f 2>/dev/null | grep -v -E "deps\/|_build\/|node_modules\/|vendor\/|build_intellij\/"'
+let $FZF_DEFAULT_OPTS = '--reverse'
+let g:fzf_tags_command = 'ctags -R --exclude=".git" --exclude="node_modules" --exclude="vendor" --exclude="log" --exclude="tmp" --exclude="db" --exclude="pkg" --exclude="deps" --exclude="_build" --extra=+f .'
+let NERDTreeIgnore=['\.pyc$', '\.o$', '\.class$', '\.lo$']
+let NERDTreeHijackNetrw = 0
+let g:ale_completion_enabled = 1
+let g:ale_fix_on_save = 1
+let g:UltiSnipsExpandTrigger="<c-e>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+imap <C-L> <SPACE>=><SPACE>
+
+nnoremap <silent> k gk
+nnoremap <silent> j gj
+nnoremap <silent> Y y$
+
+nmap <silent> <leader>nt :NERDTreeToggle<CR>
+nmap <silent> <leader>nr :NERDTree<CR>
+nmap <silent> <leader>nf :NERDTreeFind<CR>
+nmap <silent> <leader>ff :Files<CR>
+nmap <silent> <leader>pf :GFiles<CR>
+nmap <silent> <leader>bb :Buffers<CR>
+nmap <silent> <leader>ft :Tags<CR>
+nmap <silent> <leader>/ :Ag<CR>
+nmap <silent> <leader>vp :VimuxPromptCommand<CR>
+nmap <silent> <leader>vl :VimuxRunLastCommand<CR>
+nmap <silent> <leader>vi :VimuxInspectRunner<CR>
+nmap <silent> <localleader>tt :w<CR> :TestNearest<CR>
+nmap <silent> <localleader>tb :w<CR> :TestFile<CR>
+nmap <silent> <localleader>ta :wa<CR> :TestSuite<CR>
+nmap <silent> <localleader>tl :w<CR> :TestLast<CR>

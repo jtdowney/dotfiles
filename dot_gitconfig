@@ -1,0 +1,21 @@
+[user]
+    name = John Downey
+    email = jdowney@gmail.com
+[color]
+    ui = auto
+[alias]
+    ci = commit
+    co = checkout
+    st = status
+    staged = diff --cached
+    unstaged = diff
+    up = pull --rebase --autostash
+[push]
+    default = current
+[core]
+    autocrlf = input
+[rebase]
+    autosquash = true
+    autoStash = true
+[pull]
+    rebase = true

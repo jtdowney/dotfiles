@@ -1,0 +1,12 @@
+xset r rate 250 30
+xset s 300 5
+numlockx on
+pasystray &
+blueman-applet &
+dropbox &
+nextcloud &
+redshift-gtk &
+xss-lock -- i3lock -c 1D1F21 &
+feh --bg-fill ~/.background.png &
+autocutsel -fork &
+autocutsel -selection PRIMARY -fork &

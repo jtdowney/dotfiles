@@ -1,0 +1,1501 @@
+#+TITLE: Emacs configuration
+#+AUTHOR: John Downey
+#+EMAIL: jdowney@gmail.com
+#+OPTIONS: toc:nil num:nil
+
+* Basics
+
+- Bump up the GC threshold
+  #+BEGIN_SRC emacs-lisp
+    (setq gc-cons-threshold 20000000)
+  #+END_SRC
+
+- Set my information
+  #+BEGIN_SRC emacs-lisp
+    (setq user-full-name "John Downey"
+          user-login-name "jtdowney"
+          user-mail-address "jdowney@gmail.com")
+  #+END_SRC
+
+- Save recently used files
+  #+BEGIN_SRC emacs-lisp
+    (require 'recentf)
+  #+END_SRC
+
+- Set load path
+  #+BEGIN_SRC emacs-lisp
+    (defun jtdowney/add-exec-path (path)
+      "Add a path to both the environment PATH and the emacs exec-path"
+      (setenv "PATH" (concat path ":" (getenv "PATH")))
+      (add-to-list 'exec-path path))
+
+    (jtdowney/add-exec-path "/usr/local/bin")
+    (jtdowney/add-exec-path "~/.cargo/bin")
+  #+END_SRC
+
+- Smoother scrolling
+  #+BEGIN_SRC emacs-lisp
+    (setq mouse-wheel-follow-mouse 't
+          mouse-wheel-scroll-amount '(1 ((shift) . 1))
+          next-line-add-newlines nil
+          scroll-conservatively 10000
+          scroll-margin 10
+          scroll-preserve-screen-position 1
+          scroll-step 1)
+  #+END_SRC
+
+- Don't bother with auto save or backups.
+  #+BEGIN_SRC emacs-lisp
+    (setq auto-save-default nil
+          make-backup-files nil)
+  #+END_SRC
+
+- Shorten yes or no
+  #+BEGIN_SRC emacs-lisp
+    (defalias 'yes-or-no-p 'y-or-n-p)
+  #+END_SRC
+
+- Set some basic settings
+  #+BEGIN_SRC emacs-lisp
+    (setq confirm-kill-emacs #'yes-or-no-p
+          cursor-in-non-selected-windows t
+          default-directory "~/"
+          echo-keystrokes 0.1
+          help-window-select t
+          inhibit-startup-message t
+          inhibit-startup-screen t
+          initial-major-mode 'org-mode
+          initial-scratch-message nil
+          vc-follow-symlinks t)
+
+    (setq-default show-trailing-whitespace t
+                  require-final-newline t
+                  sentence-end-double-space nil)
+  #+END_SRC
+
+- I don't want the customization clobbering my =init.el=.
+  #+BEGIN_SRC emacs-lisp
+    (setq custom-file (concat user-emacs-directory "custom.el"))
+    (load custom-file 'noerror)
+  #+END_SRC
+
+- Automatically reload files if it changes on disk
+  #+BEGIN_SRC emacs-lisp
+    (global-auto-revert-mode t)
+  #+END_SRC
+
+- Word wrap at editor window
+  #+BEGIN_SRC emacs-lisp
+    (global-visual-line-mode t)
+  #+END_SRC
+
+- Use =editorconfig=
+  #+BEGIN_SRC emacs-lisp
+    (use-package editorconfig
+      :diminish
+      :config
+      (editorconfig-mode t))
+  #+END_SRC
+
+- Create directories if they don't exist
+  #+BEGIN_SRC emacs-lisp
+    (defadvice find-file (before make-directory-maybe (filename &optional wildcards) activate)
+      "Create parent directory if not exists while visiting file."
+      (unless (file-exists-p filename)
+        (let ((dir (file-name-directory filename)))
+          (unless (file-exists-p dir)
+            (make-directory dir)))))
+  #+END_SRC
+
+* =evil-mode=
+
+- I've used vim for so long that anything else is hard to switch to.
+  #+BEGIN_SRC emacs-lisp
+    (use-package evil
+      :init
+      (setq evil-want-abbrev-expand-on-insert-exit nil
+            evil-want-keybinding nil
+            evil-respect-visual-line-mode t
+            evil-want-C-i-jump nil
+            evil-want-C-d-scroll t
+            evil-want-C-u-scroll t)
+      :config
+      (evil-mode t))
+  #+END_SRC
+
+- Add some extra evil integrations.
+  #+BEGIN_SRC emacs-lisp
+    (use-package evil-collection
+      :after evil
+      :config
+      (evil-collection-init))
+  #+END_SRC
+
+- Add surround mode for evil
+  #+BEGIN_SRC emacs-lisp
+    (use-package evil-surround
+      :config
+      (global-evil-surround-mode t))
+  #+END_SRC
+
+* Key bindings
+
+- Install which-key for a handy popup key guide.
+  #+BEGIN_SRC emacs-lisp
+    (use-package which-key
+      :diminish
+      :after evil-collection
+      :config
+      (which-key-mode t)
+      (evil-collection-init 'which-key))
+  #+END_SRC
+
+- Create key maps with leader and localleader.
+  #+BEGIN_SRC emacs-lisp
+    (use-package general)
+
+    (general-def :states '(normal motion) "SPC" nil)
+    (general-create-definer jtdowney/leader-define-key
+      :states '(normal motion)
+      :keymaps 'override
+      :prefix "SPC")
+    (general-create-definer jtdowney/local-leader-define-key
+      :states '(normal motion)
+      :keymaps 'override
+      :prefix ",")
+  #+END_SRC
+
+- Define some basic key bindings
+  #+BEGIN_SRC emacs-lisp
+    (jtdowney/leader-define-key
+      "bk" #'kill-buffer
+      "bK" #'kill-buffer-and-window
+      "bs" (lambda ()
+             (interactive)
+             (switch-to-buffer "*scratch*"))
+      "bY" (lambda ()
+             (interactive)
+             (mark-whole-buffer)
+             (kill-ring-save 0 0 t))
+      "d" #'dired
+      "ha" #'apropos-command
+      "hf" #'describe-function
+      "hk" #'describe-key
+      "ho" #'describe-symbol
+      "hv" #'describe-variable)
+  #+END_SRC
+
+- Bind a simple file rename function
+  #+BEGIN_SRC emacs-lisp
+    (defun jtdowney/rename-file (new-name)
+      "Rename a file"
+      (interactive "FNew name: ")
+      (let ((filename (buffer-file-name)))
+        (if filename
+            (progn
+              (when (buffer-modified-p)
+                (save-buffer))
+              (rename-file filename new-name t)
+              (kill-buffer (current-buffer))
+              (find-file new-name)
+              (message "Renamed '%s' -> '%s'" filename new-name))
+          (message "Buffer '%s' isn't backed by a file!" (buffer-name)))))
+
+    (jtdowney/leader-define-key "fR" #'jtdowney/rename-file)
+  #+END_SRC
+
+* Completion
+
+- Install =ivy=
+  #+BEGIN_SRC emacs-lisp
+    (use-package ivy
+      :diminish
+      :after evil-collection
+      :general
+      (jtdowney/leader-define-key
+        "bb" #'ivy-switch-buffer
+        "rl" #'ivy-resume)
+      :config
+      (ivy-mode t)
+      (evil-collection-init 'ivy)
+      (setq enable-recursive-minibuffers t
+            ivy-count-format "(%d/%d) "
+            ivy-re-builders-alist '((swiper . ivy--regex-plus)
+                                    (t . ivy--regex-fuzzy))
+            ivy-use-selectable-prompt t
+            ivy-use-virtual-buffers t))
+  #+END_SRC
+
+- Install =ivy-hydra=
+  #+BEGIN_SRC emacs-lisp
+    (use-package ivy-hydra)
+  #+END_SRC
+
+- Install =swiper=
+  #+BEGIN_SRC emacs-lisp
+    (use-package swiper
+      :bind ("C-s" . #'swiper)
+      :general
+      (jtdowney/leader-define-key
+        "sb" #'swiper-all
+        "ss" #'swiper))
+  #+END_SRC
+
+- Install =counsel=
+  #+BEGIN_SRC emacs-lisp
+    (use-package counsel
+      :bind ("M-x" . counsel-M-x)
+      :general
+      (jtdowney/leader-define-key
+        "/" #'counsel-ag
+        ":" #'counsel-M-x
+        "?" #'counsel-descbinds
+        "fL" #'counsel-locate
+        "ff" #'counsel-find-file
+        "fr" #'counsel-recentf
+        "ry" #'counsel-yank-pop
+        "sj" #'counsel-imenu))
+  #+END_SRC
+
+- Install =counsel-projectile=
+  #+BEGIN_SRC emacs-lisp
+    (use-package counsel-projectile
+      :general
+      (jtdowney/leader-define-key
+        "pb" #'counsel-projectile-switch-to-buffer
+        "pd" #'counsel-projectile-find-dir
+        "pp" #'counsel-projectile-switch-project
+        "pf" #'counsel-projectile-find-file
+        "saf" #'counsel-ag
+        "sap" #'counsel-projectile-ag
+        "sgf" #'counsel-grep
+        "sgp" #'counsel-projectile-git-grep))
+  #+END_SRC
+
+- Install =ivy-rich=
+  #+BEGIN_SRC emacs-lisp
+    (use-package ivy-rich
+      :config
+      (ivy-rich-mode t)
+      (setq ivy-rich-path-style 'abbrev))
+  #+END_SRC
+
+- Install =smex= for recent commands list
+  #+BEGIN_SRC emacs-lisp
+    (use-package smex)
+  #+END_SRC
+
+* =avy=
+
+#+BEGIN_SRC emacs-lisp
+    (use-package avy
+      :general
+      (jtdowney/leader-define-key
+        "jJ" #'evil-avy-goto-char-2
+        "jj" #'evil-avy-goto-char
+        "jl" #'evil-avy-goto-line
+        "jw" #'evil-avy-goto-word-or-subword-1))
+#+END_SRC
+
+* =dired=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package dired
+    :ensure f
+    :general (:states 'motion
+              :keymaps 'override
+              "_" #'projectile-dired
+              "-" #'dired-jump)
+    :init
+    (require 'dired-x))
+#+END_SRC
+
+* OS specific
+** Linux X11
+
+#+BEGIN_SRC emacs-lisp
+  (when (and (display-graphic-p)
+             (eq system-type 'gnu/linux))
+    (setq x-select-enable-clipboard t))
+#+END_SRC
+
+** macOS
+
+#+BEGIN_SRC emacs-lisp
+  (when (eq system-type 'darwin)
+    (setq mac-command-modifier 'super
+          mac-option-modifier 'meta
+          mac-right-command-modifier 'super
+          mac-right-option-modifier 'nil)
+    (general-define-key "s-c" #'kill-ring-save
+                        "s-v" #'yank
+                        "s-x" #'kill-region))
+#+END_SRC
+
+* UI preferences
+** Tweak window chrome
+
+#+BEGIN_SRC emacs-lisp
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+
+  (when (display-graphic-p)
+    (scroll-bar-mode -1))
+#+END_SRC
+
+** Use fancy lambdas
+
+#+BEGIN_SRC emacs-lisp
+  (global-prettify-symbols-mode t)
+#+END_SRC
+
+** Load a theme
+
+#+BEGIN_SRC emacs-lisp
+  (use-package zenburn-theme
+    :init
+    (setq zenburn-height-minus-1 1.0
+          zenburn-height-plus-1 1.0
+          zenburn-height-plus-2 1.0
+          zenburn-height-plus-3 1.0
+          zenburn-height-plus-4 1.0
+          zenburn-use-variable-pitch nil
+          zenburn-scale-org-headlines nil)
+    (load-theme 'zenburn t))
+#+END_SRC
+
+** Setup powerline
+
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :config
+    (spaceline-spacemacs-theme))
+#+END_SRC
+
+** Set font and configure font resizing
+
+#+BEGIN_SRC emacs-lisp
+  (setq jtdowney/default-font "Hack"
+        jtdowney/default-font-size 12
+        jtdowney/current-font-size jtdowney/default-font-size
+        jtdowney/font-change-increment 1.1)
+
+  (defun jtdowney/font-code ()
+    "Return a string representing the current font (like \"Hack-15\")."
+    (concat jtdowney/default-font "-" (number-to-string jtdowney/current-font-size)))
+
+  (defun jtdowney/set-font-size ()
+    "Set the font to `jtdowney/default-font' at `jtdowney/current-font-size'.
+    Set that for the current frame, and also make it the default for
+    other, future frames."
+    (let ((font-code (jtdowney/font-code)))
+      (add-to-list 'default-frame-alist (cons 'font font-code))
+      (set-frame-font font-code)))
+
+  (defun jtdowney/reset-font-size ()
+    "Change font size back to `jtdowney/default-font-size'."
+    (interactive)
+    (setq jtdowney/current-font-size jtdowney/default-font-size)
+    (jtdowney/set-font-size))
+
+  (defun jtdowney/increase-font-size ()
+    "Increase current font size by a factor of `jtdowney/font-change-increment'."
+    (interactive)
+    (setq jtdowney/current-font-size
+          (ceiling (* jtdowney/current-font-size jtdowney/font-change-increment)))
+    (jtdowney/set-font-size))
+
+  (defun jtdowney/decrease-font-size ()
+    "Decrease current font size by a factor of `jtdowney/font-change-increment', down to a minimum size of 1."
+    (interactive)
+    (setq jtdowney/current-font-size
+          (max 1
+               (floor (/ jtdowney/current-font-size jtdowney/font-change-increment))))
+    (jtdowney/set-font-size))
+
+  (general-define-key "s-0" #'jtdowney/reset-font-size
+                      "s-+" #'jtdowney/increase-font-size
+                      "s-=" #'jtdowney/increase-font-size
+                      "s-_" #'jtdowney/decrease-font-size
+                      "s--" #'jtdowney/decrease-font-size)
+
+  (jtdowney/reset-font-size)
+#+END_SRC
+
+** Highlight current line
+
+#+BEGIN_SRC emacs-lisp
+  (global-hl-line-mode t)
+#+END_SRC
+
+** Show column in mode line
+
+#+BEGIN_SRC emacs-lisp
+  (column-number-mode t)
+#+END_SRC
+
+** Show line numbers
+
+#+BEGIN_SRC emacs-lisp
+  (setq display-line-numbers-grow-only t
+        display-line-numbers-width-start t
+        linum-format "%4d \u2502 "
+        jtdowney/line-number-hooks '(org-mode-hook
+                                     markdown-mode-hook
+                                     text-mode-hook
+                                     prog-mode-hook)
+        jtdowney/line-number-mode (if (version< emacs-version "26.0")
+                                      #'linum-mode
+                                    #'display-line-numbers-mode))
+
+  (dolist (hook jtdowney/line-number-hooks)
+    (add-hook hook jtdowney/line-number-mode))
+#+END_SRC
+
+** Show end of file
+
+#+BEGIN_SRC emacs-lisp
+  (when (display-graphic-p)
+    (use-package vi-tilde-fringe
+      :diminish
+      :hook (prog-mode . vi-tilde-fringe-mode)))
+#+END_SRC
+
+** Hide some minor modes
+
+#+BEGIN_SRC emacs-lisp
+  (defmacro diminish-minor-mode (filename mode &optional abbrev)
+    `(eval-after-load (symbol-name ,filename)
+       '(diminish ,mode ,abbrev)))
+
+  (diminish-minor-mode 'abbrev 'abbrev-mode)
+  (diminish-minor-mode 'eldoc 'eldoc-mode)
+  (diminish-minor-mode 'flycheck 'flycheck-mode)
+  (diminish-minor-mode 'flyspell 'flyspell-mode)
+  (diminish-minor-mode 'org-indent 'org-indent-mode)
+  (diminish-minor-mode 'simple 'visual-line-mode)
+  (diminish-minor-mode 'subword 'subword-mode)
+  (diminish-minor-mode 'undo-tree 'undo-tree-mode)
+#+END_SRC
+
+* =org-mode=
+** Basics
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-startup-indented t
+        org-src-fontify-natively t
+        org-log-done 'time
+        org-export-with-toc nil
+        org-M-RET-may-split-line nil
+        org-agenda-skip-scheduled-if-done t
+        org-directory (file-name-as-directory "~/org")
+        org-todo-keywords '((sequence "TODO(t)" "WAITING(w@)" "|" "DONE(d)" "CANCELED(c@)))"))
+        org-archive-location (concat (file-name-as-directory org-directory)
+                                     "archive.org"
+                                     "::* From %s"))
+#+END_SRC
+
+** Agenda
+
+#+BEGIN_SRC emacs-lisp
+  (require 'find-lisp)
+  (setq jtdowney/org-inbox-file (concat org-directory "inbox.org")
+        org-agenda-files (find-lisp-find-files org-directory "\.org$"))
+#+END_SRC
+
+** Refile
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
+#+END_SRC
+
+** =evil-mode= integration
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-org
+    :after org
+    :diminish
+    :hook (org-mode . evil-org-mode)
+    :config
+    (add-hook 'evil-org-mode-hook
+              (lambda ()
+                (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading)))))
+
+  (use-package evil-org-agenda
+    :after evil-org
+    :ensure f
+    :config
+    (evil-org-agenda-set-keys))
+#+END_SRC
+
+** Key bindings
+
+#+BEGIN_SRC emacs-lisp
+  (jtdowney/leader-define-key
+    "oa" #'org-agenda-list
+    "oc" #'counsel-org-capture
+    "om" #'org-tags-view
+    "oo" #'org-agenda
+    "ot" #'org-todo-list)
+
+  (jtdowney/local-leader-define-key org-mode-map
+    "!" #'org-time-stamp-inactive
+    "'" #'org-edit-special
+    "*" #'org-ctrl-c-star
+    "," #'org-ctrl-c-ctrl-c
+    "-" #'org-ctrl-c-minus
+    "." #'org-time-stamp
+    "/" #'org-sparse-tree
+    ":" #'org-set-tags
+    "A" #'org-archive-subtree
+    "D" #'org-insert-drawer
+    "H" #'org-shiftleft
+    "I" #'org-clock-in
+    "J" #'org-shiftdown
+    "K" #'org-shiftup
+    "L" #'org-shiftright
+    "N" #'widen
+    "O" #'org-clock-out
+    "P" #'org-set-property
+    "R" #'org-refile
+    "Sh" #'org-promote-subtree
+    "Sj" #'org-move-subtree-down
+    "Sk" #'org-move-subtree-up
+    "Sl" #'org-demote-subtree
+    "T" #'org-show-todo-tree
+    "^" #'org-sort
+    "a" #'org-agenda
+    "b" #'org-tree-to-indirect-buffer
+    "c" #'org-capture
+    "d" #'org-deadline
+    "e" #'org-export-dispatch
+    "f" #'org-set-effort
+    "hI" #'org-insert-heading
+    "hi" #'org-insert-heading-after-current
+    "hs" #'org-insert-subheading
+    "ia" #'org-attach
+    "if" #'org-footnote-new
+    "il" #'org-insert-link
+    "l" #'org-open-at-point
+    "n" #'org-narrow-to-subtree
+    "q" #'org-clock-cancel
+    "s" #'org-schedule
+    "tE" #'org-table-export
+    "tH" #'org-table-move-column-left
+    "tI" #'org-table-import
+    "tJ" #'org-table-move-row-down
+    "tK" #'org-table-move-row-up
+    "tL" #'org-table-move-column-right
+    "tN" #'org-table-create-with-table.el
+    "ta" #'org-table-align
+    "tb" #'org-table-blank-field
+    "tc" #'org-table-convert
+    "tdc" #'org-table-delete-column
+    "tdr" #'org-table-kill-row
+    "te" #'org-table-eval-formula
+    "th" #'org-table-previous-field
+    "tiH" #'org-table-hline-and-move
+    "tic" #'org-table-insert-column
+    "tih" #'org-table-insert-hline
+    "tir" #'org-table-insert-row
+    "tj" #'org-table-next-row
+    "tl" #'org-table-next-field
+    "tn" #'org-table-create
+    "tr" #'org-table-recalculate
+    "ts" #'org-table-sort-lines
+    "ttf" #'org-table-toggle-formula-debugger
+    "tto" #'org-table-toggle-coordinate-overlays
+    "tw" #'org-table-wrap-region
+    (kbd "RET") #'org-ctrl-c-ret)
+#+END_SRC
+
+** Capture templates
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-capture-templates
+        `(("b" "Blog idea" entry
+           (file ,(concat org-directory "blog-ideas.org"))
+           "* %?\n")
+          ("f" "Finished book" table-line
+           (file+headline ,(concat org-directory "books.org") "Finished")
+           "| %^{Title} | %^{Author} | %u |")
+          ("r" "Book to read" entry
+           (file+headline ,(concat org-directory "books.org") "To Read")
+           "* %i%?\n")
+          ("t" "Todo" entry
+           (file ,jtdowney/org-inbox-file)
+           "* TODO %i%?\n")))
+#+END_SRC
+
+** Display preferences
+
+- Use pretty bullets instead of asterisks.
+  #+BEGIN_SRC emacs-lisp
+    (use-package org-bullets
+      :hook (org-mode . org-bullets-mode))
+  #+END_SRC
+
+- Use syntax highlighting in source blocks while editing.
+  #+BEGIN_SRC emacs-lisp
+    (setq org-src-fontify-natively t)
+  #+END_SRC
+
+** Expansions
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-structure-template-alist
+               '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+#+END_SRC
+
+** Exporting
+
+- Install htmlize for html exports.
+  #+BEGIN_SRC emacs-lisp
+    (use-package htmlize
+      :defer t)
+  #+END_SRC
+
+- Export to bootstrap html.
+  #+BEGIN_SRC emacs-lisp
+    (use-package ox-twbs)
+  #+END_SRC
+
+- Export to github flavored markdown.
+  #+BEGIN_SRC emacs-lisp
+    (use-package ox-gfm)
+  #+END_SRC
+
+# Presentations with reveal - removed due to https://github.com/yjwen/org-reveal/issues/342
+
+# #+BEGIN_SRC emacs-lisp
+#   (use-package ox-reveal
+#     :config
+#     (setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/"))
+# #+END_SRC
+
+** Projectile
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-projectile
+    :general
+    (jtdowney/leader-define-key "opc" #'org-projectile-capture-for-current-project)
+    (jtdowney/leader-define-key "opo" (lambda ()
+                                        (interactive)
+                                        (org-projectile-goto-location-for-project (projectile-project-name))))
+    :config
+    (org-projectile-per-project)
+    (setq org-projectile-per-project-filepath "todo.org"))
+#+END_SRC
+
+** Pomodoro
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-pomodoro
+    :general
+    (jtdowney/leader-define-key "oP" #'org-pomodoro)
+    (jtdowney/local-leader-define-key org-mode-map "p" #'org-pomodoro)
+    (jtdowney/local-leader-define-key org-agenda-mode-map "p" #'org-pomodoro))
+#+END_SRC
+
+* Spell checking
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flyspell
+    :ensure f
+    :hook ((text-mode . flyspell-mode)
+           (prog-mode . flyspell-prog-mode))
+    :init
+    (setq ispell-program-name "aspell"))
+
+  (use-package flyspell-correct)
+  (use-package flyspell-correct-ivy)
+#+END_SRC
+
+* Project management
+
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :general
+    (jtdowney/leader-define-key
+      "pr" 'projectile-recentf
+      "pv" 'projectile-vc)
+    :config
+    (projectile-global-mode t)
+    (setq projectile-completion-system 'ivy))
+#+END_SRC
+
+* Version control
+** =magit=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :after evil-collection
+    :general
+    (jtdowney/leader-define-key
+      "gS" #'magit-stage-file
+      "gU" #'magit-unstage-file
+      "gb" #'magit-blame
+      "gfh" #'magit-log-buffer-file
+      "gm" #'magit-dispatch-popup
+      "gs" #'magit-status)
+    :config
+    (setq magit-push-always-verify nil
+          git-commit-summary-max-length 50)
+    (evil-collection-init 'magit))
+
+  (use-package evil-magit
+    :after magit
+    :init
+    (setq evil-magit-state 'normal
+          evil-magit-use-y-for-yank nil))
+#+END_SRC
+** =git-timemachine=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package git-timemachine
+    :general
+    (jtdowney/leader-define-key "gt" #'git-timemachine))
+#+END_SRC
+
+** Highlight uncommitted changes
+
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :hook ((prog-mode text-mode vc-dir-mode) . diff-hl-mode))
+#+END_SRC
+
+* Terminal
+
+#+BEGIN_SRC emacs-lisp
+  (use-package multi-term
+    :general
+    (jtdowney/leader-define-key "'" #'multi-term)
+    :init
+    (setq multi-term-program-switches "--login")
+    :config
+    (evil-set-initial-state 'term-mode 'emacs))
+
+  (defun jtdowney/term-paste (&optional string)
+    "Paste into the terminal"
+    (interactive)
+    (process-send-string
+     (get-buffer-process (current-buffer))
+     (if string string (current-kill 0))))
+
+  (add-hook 'term-mode-hook
+            (lambda ()
+              (goto-address-mode t)
+              (general-define-key :keymap term-raw-map
+                                  "s-v" #'jtdowney/term-paste)
+              (setq yas-dont-activate t)))
+  #+END_SRC
+
+* Programming environments
+** General
+
+- Set tabs to display as 2 spaces instead of 8.
+  #+BEGIN_SRC emacs-lisp
+    (setq-default tab-width 2)
+    (setq-default indent-tabs-mode nil)
+  #+END_SRC
+
+- Use matchit
+  #+BEGIN_SRC emacs-lisp
+    (use-package evil-matchit
+      :after evil
+      :config
+      (global-evil-matchit-mode t))
+  #+END_SRC
+
+- Mark scripts as executable
+  #+BEGIN_SRC emacs-lisp
+    (add-hook 'after-save-hook
+              #'executable-make-buffer-file-executable-if-script-p)
+  #+END_SRC
+
+- Treat _ as part of a word like vim
+  #+BEGIN_SRC emacs-lisp
+    (add-hook 'prog-mode-hook (lambda () (modify-syntax-entry ?_ "w")))
+  #+END_SRC
+
+- Delete trailing whitespace
+  #+BEGIN_SRC emacs-lisp
+    (add-hook 'before-save-hook (lambda ()
+                                  (when (derived-mode-p 'prog-mode)
+                                    (whitespace-cleanup))))
+  #+END_SRC
+
+- Don't use show-paren-mode except when enabled
+  #+BEGIN_SRC emacs-lisp
+    (show-paren-mode t)
+    (setq-default show-paren-mode nil)
+    (setq show-paren-style 'expression
+          show-paren-delay 0
+          show-paren-when-point-in-periphery t)
+  #+END_SRC
+
+** Completion
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :after evil-collection
+    :hook (after-init . global-company-mode)
+    :diminish
+    :init
+    (setq company-idle-delay 0.1
+          company-minimum-prefix-length 1
+          company-selection-wrap-around t
+          company-backends '(company-capf
+                             company-files
+                             company-keywords)
+          company-global-modes '(not org-mode))
+
+    (defun jtdowney/company-mode-with-yasipptet (backend)
+      "Make yasnippet show up with any company-mode backend"
+      (append (if (consp backend)
+                  backend
+                (list backend))
+              '(:with company-yasnippet)))
+    (setq company-backends (mapcar #'jtdowney/company-mode-with-yasipptet
+                                   company-backends))
+    :config
+    (evil-collection-init 'company))
+#+END_SRC
+
+** Electric pairs
+
+#+BEGIN_SRC emacs-lisp
+  (use-package electric-pair-mode
+    :ensure f
+    :hook prog-mode)
+#+END_SRC
+
+** Smartparens
+
+#+BEGIN_SRC emacs-lisp
+  (use-package smartparens)
+#+END_SRC
+
+** Comments
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-commentary
+    :diminish
+    :after evil
+    :config
+    (evil-commentary-mode t))
+#+END_SRC
+
+** Syntax checking
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :diminish
+    :hook (after-init . global-flycheck-mode)
+    :general
+    (jtdowney/leader-define-key
+      "el" #'flycheck-list-errors
+      "en" #'flycheck-next-error
+      "ep" #'flycheck-previous-error)
+    :config
+    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+    (evil-collection-init 'flycheck))
+#+END_SRC
+
+** Snippets
+
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :diminish yas-minor-mode
+    :general (:states 'insert
+              :keymaps 'override
+              "C-e" #'yas-expand)
+    :config
+    (yas-global-mode t))
+
+  (use-package yasnippet-snippets)
+#+END_SRC
+
+** Lisps
+
+#+BEGIN_SRC emacs-lisp
+  (setq lispy-modes
+        '(clojure-mode
+          emacs-lisp-mode
+          lisp-mode
+          racket-mode
+          scheme-mode))
+
+  (defvar lispy-mode-hook nil
+    "Hook called after a lispy mode is activated")
+
+  (use-package paredit
+    :hook (lispy-mode . paredit-mode))
+  (use-package rainbow-delimiters
+    :hook (lispy-mode . rainbow-delimiters-mode))
+
+  (dolist (mode lispy-modes)
+    (add-hook (intern (concat (symbol-name mode) "-hook"))
+              (lambda ()
+                (setq-local show-paren-mode t)
+                (run-hooks 'lispy-mode-hook))))
+
+  (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
+#+END_SRC
+
+** Rust
+*** =rust-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rust-mode
+    :mode "\\.rs\\'"
+    :general
+    (jtdowney/local-leader-define-key rust-mode-map
+      "=" #'rust-format-buffer)
+    :init
+    (setq rust-format-on-save t))
+#+END_SRC
+
+*** =racer=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package racer
+    :diminish
+    :hook (rust-mode . racer-mode)
+    :general
+    (jtdowney/local-leader-define-key rust-mode-map
+      (kbd "TAB") #'company-indent-or-complete-common)
+    :config
+    (setq company-tooltip-align-annotations t)
+    (add-hook 'racer-mode-hook #'eldoc-mode))
+#+END_SRC
+
+*** =cargo=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package cargo
+    :diminish cargo-minor-mode
+    :hook (rust-mode . cargo-minor-mode)
+    :general
+    (jtdowney/local-leader-define-key rust-mode-map
+      "c." #'cargo-process-repeat
+      "cC" #'cargo-process-clean
+      "cK" #'cargo-process-clippy
+      "cU" #'cargo-process-upgrade
+      "cX" #'cargo-process-run-example
+      "ca" #'cargo-process-add
+      "cc" #'cargo-process-build
+      "cd" #'cargo-process-doc
+      "cf" #'cargo-process-fmt
+      "ck" #'cargo-process-check
+      "cr" #'cargo-process-rm
+      "cu" #'cargo-process-update
+      "cx" #'cargo-process-run
+      "ta" #'cargo-process-test
+      "tb" #'cargo-process-current-file-tests
+      "tt" #'cargo-process-current-test))
+#+END_SRC
+
+*** =flycheck-rust=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck-rust
+    :hook (rust-mode . flycheck-rust-setup))
+#+END_SRC
+
+** Ruby
+*** =rbenv=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rbenv
+    :init
+    (global-rbenv-mode))
+#+END_SRC
+
+*** =enh-ruby-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package enh-ruby-mode
+    :mode (("Appraisals\\'" . enh-ruby-mode)
+           ("\\(Rake\\|Thor\\|Guard\\|Gem\\|Cap\\|Vagrant\\|Berks\\|Pod\\|Puppet\\)file\\'" . enh-ruby-mode)
+           ("\\.\\(rb\\|rabl\\|ru\\|builder\\|rake\\|thor\\|gemspec\\|jbuilder\\)\\'" . enh-ruby-mode))
+    :interpreter "ruby"
+    :init
+    (setq enh-ruby-deep-indent-paren nil
+          enh-ruby-hanging-paren-deep-indent-level 2))
+#+END_SRC
+
+*** =ruby-end=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ruby-end
+    :diminish)
+#+END_SRC
+
+*** =bundler=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package bundler
+    :after enh-ruby-mode
+    :general
+    (jtdowney/local-leader-define-key enh-ruby-mode-map
+      "bi" #'bundle-install
+      "bs" #'bundle-console
+      "bu" #'bundle-update
+      "bx" #'bundle-exec))
+#+END_SRC
+
+*** =robe=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package robe
+    :hook (enh-ruby-mode . robe-mode)
+    :general
+    (jtdowney/local-leader-define-key enh-ruby-mode-map
+      "'" #'robe-start
+      "hd" #'robe-doc
+      "rsr" #'robe-rails-refresh
+      "sF" #'ruby-send-definition-and-go
+      "sR" #'ruby-send-region-and-go
+      "sf" #'ruby-send-definition
+      "si" #'robe-start
+      "sr" #'ruby-send-region
+      "ss" #'ruby-switch-to-inf)
+    :config
+    (push '(company-robe :with company-yasnippet) company-backends))
+#+END_SRC
+
+** YAML
+
+#+BEGIN_SRC emacs-lisp
+  (use-package yaml-mode)
+#+END_SRC
+
+** TOML
+
+#+BEGIN_SRC emacs-lisp
+  (use-package toml-mode)
+#+END_SRC
+
+** Markdown
+
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :commands (markdown-mode gfm-mode)
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'" . markdown-mode)))
+#+END_SRC
+
+** Clojure
+*** Display
+
+#+BEGIN_SRC emacs-lisp
+  (defun jtdowney/clojure-fancy-symbols (m)
+    "Makes special symbols show up as a fancy font"
+    (font-lock-add-keywords m
+                            `(("(\\(fn\\)[\[[:space:]]"
+                               (0 (progn (compose-region (match-beginning 1)
+                                                         (match-end 1) "λ"))))
+                              ("(\\(partial\\)[\[[:space:]]"
+                               (0 (progn (compose-region (match-beginning 1)
+                                                         (match-end 1) "Ƥ"))))
+                              ("(\\(comp\\)[\[[:space:]]"
+                               (0 (progn (compose-region (match-beginning 1)
+                                                         (match-end 1) "∘"))))
+                              ("\\(#\\)("
+                               (0 (progn (compose-region (match-beginning 1)
+                                                         (match-end 1) "ƒ"))))
+                              ("\\(#\\){"
+                               (0 (progn (compose-region (match-beginning 1)
+                                                         (match-end 1) "∈")))))))
+#+END_SRC
+
+*** =clojure-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package clojure-mode
+    :mode (("\\.clj\\'" . clojure-mode)
+           ("\\.edn\\'" . clojure-mode)
+           ("\\.cljs\\'" . clojurescript-mode)
+           ("\\.cljc\\'" . clojurec-mode))
+    :config
+    (dolist (m '(clojure-mode clojurescript-mode clojurec-mode))
+            (jtdowney/clojure-fancy-symbols m)))
+#+END_SRC
+
+*** =cider=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package cider
+    :hook (clojure-mode . cider-mode)
+    :config
+    (setq nrepl-log-messages t
+          cider-repl-display-in-current-window t
+          cider-repl-use-clojure-font-lock t
+          cider-prompt-save-file-on-load 'always-save
+          cider-font-lock-dynamically '(macro core function var)
+          nrepl-hide-special-buffers t
+          cider-overlays-use-font-lock t)
+    (cider-repl-toggle-pretty-printing)
+    (jtdowney/clojure-fancy-symbols 'cider-repl-mode)
+    :general
+    (dolist (m '(clojure-mode
+                 clojurec-mode
+                 clojurescript-mode))
+      (require 'clojure-mode)
+      (let* ((map-name (intern (concat (symbol-name m) "-map")))
+             (map (symbol-value map-name)))
+        (jtdowney/local-leader-define-key ,map
+          "ha" #'cider-apropos
+          "hh" #'cider-doc
+          "hg" #'cider-grimoire
+          "hj" #'cider-javadoc
+          "hn" #'cider-browse-ns
+          "eb" #'cider-eval-buffer
+          "ee" #'cider-eval-last-sexp
+          "ef" #'cider-eval-defun-at-point
+          "em" #'cider-macroexpand-1
+          "eM" #'cider-macroexpand-all
+          "er" #'cider-eval-region
+          "ew" #'cider-eval-last-sexp-and-replace
+          "="  #'cider-format-buffer
+          "fb" #'cider-format-buffer
+          "gb" #'cider-pop-back
+          "gC" #'cider-classpath
+          "ge" #'cider-jump-to-compilation-error
+          "gr" #'cider-jump-to-resource
+          "gn" #'cider-browse-ns
+          "gN" #'cider-browse-ns-all
+          "'"  #'cider-jack-in
+          "\""  #'cider-jack-in-clojurescript
+          "sb" #'cider-load-buffer
+          "sc" (if (eq m 'cider-repl-mode)
+                   #'cider-repl-clear-buffer
+                 #'cider-connect)
+          "sC" #'cider-find-and-clear-repl-output
+          "si" #'cider-jack-in
+          "sI" #'cider-jack-in-clojurescript
+          "so" #'cider-repl-switch-to-other
+          "sq" #'cider-quit
+          "ss" (if (eq m 'cider-repl-mode)
+                   #'cider-switch-to-last-clojure-buffer
+                 #'cider-switch-to-repl-buffer)
+          "sx" #'cider-refresh
+          "Te" #'cider-enlighten-mode
+          "Tt" #'cider-auto-test-mode
+          "db" #'cider-debug-defun-at-point
+          "dv" #'cider-inspect
+          "rc{" #'clojure-convert-collection-to-map
+          "rc(" #'clojure-convert-collection-to-list
+          "rc'" #'clojure-convert-collection-to-quoted-list
+          "rc#" #'clojure-convert-collection-to-set
+          "rc[" #'clojure-convert-collection-to-vector))))
+
+  (use-package cider-eval-sexp-fu)
+#+END_SRC
+
+** Go
+*** =go-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode
+    :mode "\\.go\\'"
+    :general
+    (jtdowney/local-leader-define-key go-mode-map
+      "hh" #'godoc-at-point
+      "ig" #'go-goto-imports
+      "ia" #'go-import-add
+      "ir" #'go-remove-unused-imports
+      "eb" #'go-play-buffer
+      "er" #'go-play-region
+      "ed" #'go-download-play
+      "gc" #'go-coverage)
+    :init
+    (setq gofmt-command "goimports")
+    :config
+    (add-hook 'before-save-hook #'gofmt-before-save))
+#+END_SRC
+
+*** =flycheck-gometalinter=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck-gometalinter
+    :after go-mode
+    :config
+    (flycheck-gometalinter-setup))
+#+END_SRC
+
+*** =gotest=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package gotest
+    :after go-mode
+    :general
+    (jtdowney/local-leader-define-key go-mode-map
+      "tt" #'go-test-current-test
+      "tb" #'go-test-current-file
+      "ta" #'go-test-current-project))
+#+END_SRC
+
+*** =company-go=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company-go
+    :after go-mode
+    :config
+    (add-hook 'go-mode-hook (lambda ()
+                              (make-local-variable 'company-backends)
+                              (setq company-backends (copy-tree company-backends))
+                              (push '(company-go :with company-yasnippet) company-backends))))
+#+END_SRC
+
+** Scheme
+*** =geiser=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package geiser
+    :hook (scheme-mode . geiser-mode)
+    :general
+    (jtdowney/local-leader-define-key scheme-mode-map
+      "'" #'geiser-mode-switch-to-repl
+      "cc" #'geiser-compile-current-buffer
+      "cp" #'geiser-add-to-load-path
+      "eb" #'geiser-eval-buffer
+      "ee" #'geiser-eval-last-sexp
+      "ef" #'geiser-eval-definition
+      "er" #'geiser-eval-region
+      "gN" #'previous-error
+      "gb" #'geiser-pop-symbol-stack
+      "gm" #'geiser-edit-module
+      "gn" #'next-error
+      "h<" #'geiser-xref-callers
+      "h>" #'geiser-xref-callees
+      "hd" #'geiser-doc-look-up-manual
+      "hh" #'geiser-doc-symbol-at-point
+      "hm" #'geiser-doc-module
+      "il" #'geiser-insert-lambda
+      "me" #'geiser-expand-last-sexp
+      "mf" #'geiser-expand-definition
+      "mx" #'geiser-expand-region
+      "sB" #'geiser-eval-buffer-and-go
+      "sF" #'geiser-eval-definition-and-go
+      "sR" #'geiser-eval-region-and-go
+      "sb" #'geiser-eval-buffer
+      "se" #'geiser-eval-last-sexp
+      "sf" #'geiser-eval-definition
+      "si" #'geiser-mode-switch-to-repl
+      "sr" #'geiser-eval-region
+      "ss" #'geiser-set-scheme)
+    :config
+    (evil-collection-init 'geiser))
+#+END_SRC
+
+** Racket
+*** =racket-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package racket-mode
+    :mode ("\\.rkt\\'" "\\.pie\\'")
+    :general
+    (jtdowney/local-leader-define-key racket-mode-map
+      "g`" #'racket-unvisit
+      "gm" #'racket-visit-module
+      "gr" #'racket-open-require-path
+      "hd" #'racket-describe
+      "hh" #'racket-doc
+      "il" #'racket-insert-lambda
+      "'"  #'racket-repl
+      "sb" #'racket-run
+      "se" #'racket-send-last-sexp
+      "sf" #'racket-send-definition
+      "si" #'racket-repl
+      "sr" #'racket-send-region
+      "ss" #'racket-repl
+      "tb" #'racket-test))
+#+END_SRC
+
+** Elixir
+*** =elixir-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package elixir-mode
+    :mode ("\\.ex\\'" "\\.exs\\'" "\\.elixir\\'")
+    :init
+    (add-hook 'elixir-mode-hook #'smartparens-mode)
+    (add-hook 'before-save-hook 'elixir-format nil t))
+#+END_SRC
+
+*** =alchemist=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package alchemist
+    :hook (elixir-mode . alchemist-mode)
+    :general
+    (jtdowney/local-leader-define-key elixir-mode-map
+        "'"  #'alchemist-iex-run
+        "," #'alchemist-goto-jump-back
+        "c:" #'alchemist-compile
+        "cb" #'alchemist-compile-this-buffer
+        "cf" #'alchemist-compile-file
+        "eB" #'alchemist-eval-print-buffer
+        "eJ" #'alchemist-eval-print-quoted-current-line
+        "eL" #'alchemist-eval-print-current-line
+        "eR" #'alchemist-eval-print-region
+        "eU" #'alchemist-eval-print-quoted-region
+        "eV" #'alchemist-eval-print-quoted-buffer
+        "eb" #'alchemist-eval-buffer
+        "ej" #'alchemist-eval-quoted-current-line
+        "el" #'alchemist-eval-current-line
+        "er" #'alchemist-eval-region
+        "eu" #'alchemist-eval-quoted-region
+        "ev" #'alchemist-eval-quoted-buffer
+        "gT" #'alchemist-project-toggle-file-and-tests-other-window
+        "gt" #'alchemist-project-toggle-file-and-tests
+        "h:" #'alchemist-help
+        "hH" #'alchemist-help-history
+        "hh" #'alchemist-help-search-at-point
+        "hr" #'alchemist-help-search-marked-region
+        "m:" #'alchemist-mix
+        "mc" #'alchemist-mix-compile
+        "mh" #'alchemist-mix-help
+        "mx" #'alchemist-mix-run
+        "pt" #'alchemist-project-find-test
+        "sI" #'alchemist-iex-project-run
+        "sL" #'alchemist-iex-send-current-line-and-go
+        "sR" #'alchemist-iex-send-region-and-go
+        "sc" #'alchemist-iex-compile-this-buffer
+        "si" #'alchemist-iex-run
+        "sl" #'alchemist-iex-send-current-line
+        "sm" #'alchemist-iex-reload-module
+        "sr" #'alchemist-iex-send-region
+        "ta" #'alchemist-mix-test
+        "tb" #'alchemist-mix-test-this-buffer
+        "tf" #'alchemist-test-file
+        "tn" #'alchemist-test-jump-to-next-test
+        "tp" #'alchemist-test-jump-to-previous-test
+        "tr" #'alchemist-mix-rerun-last-test
+        "tt" #'alchemist-mix-test-at-point
+        "x:" #'alchemist-execute
+        "xb" #'alchemist-execute-this-buffer
+        "xf" #'alchemist-execute-file
+      ))
+#+END_SRC
+
+*** =flycheck-mix=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck-mix
+    :config (flycheck-mix-setup))
+#+END_SRC
+
+** Haskell
+*** =haskell-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package haskell-mode
+    :general
+    (jtdowney/local-leader-define-key haskell-mode-map
+      "F"   #'haskell-mode-stylish-buffer
+      "ca"  #'haskell-process-cabal
+      "cb"  #'haskell-process-cabal-build
+      "cc"  #'haskell-compile
+      "cv"  #'haskell-cabal-visit-file
+      "dB"  #'haskell-debug/delete
+      "dN"  #'haskell-debug/previous
+      "da"  #'haskell-debug/abandon
+      "db"  #'haskell-debug/break-on-function
+      "dc"  #'haskell-debug/continue
+      "dd"  #'haskell-debug
+      "dn"  #'haskell-debug/next
+      "dp"  #'haskell-debug/previous
+      "dr"  #'haskell-debug/refresh
+      "ds"  #'haskell-debug/step
+      "dt"  #'haskell-debug/trace
+      "gi"  #'haskell-navigate-imports
+      "hH"  #'haskell-hoogle-lookup-from-local
+      "hd"  #'inferior-haskell-find-haddock
+      "hh"  #'hoogle
+      "hi"  #'haskell-process-do-info
+      "ht"  #'haskell-process-do-type
+      "hy"  #'hayoo
+      "sS"  #'haskell-interactive-switch
+      "sb"  #'haskell-process-load-file
+      "sc"  #'haskell-interactive-mode-clear)
+    :config
+    (setq haskell-process-type 'stack-ghci))
+#+END_SRC
+
+*** =hindent=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package hindent
+    :hook (haskell-mode . hindent-mode)
+    :general
+    (jtdowney/local-leader-define-key haskell-mode-map
+      "f" #'hindent-reformat-decl)
+    :config
+    (setq hindent-reformat-buffer-on-save t))
+#+END_SRC
+
+* Financial
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ledger-mode
+    :mode "\\.ledger\\'"
+    :general
+    (jtdowney/local-leader-define-key ledger-mode-map
+      "a" #'ledger-add-transaction
+      "b" #'ledger-post-edit-amount
+      "c" #'ledger-toggle-current
+      "C" #'ledger-mode-clean-buffer
+      "p" #'ledger-display-balance-at-point
+      "q" #'ledger-post-align-xact)
+    :init
+    (add-hook 'ledger-mode-hook 'flycheck-mode)
+    (setq ledger-post-amount-alignment-column 64
+          ledger-clear-whole-transactions t))
+
+  (use-package flycheck-ledger
+    :after ledger-mode)
+#+END_SRC
+
+* Remote editing
+
+#+BEGIN_SRC emacs-lisp
+  (use-package tramp
+    :ensure f
+    :init
+    (setq tramp-default-method "ssh"))
+#+END_SRC
+
+* Notes
+
+#+BEGIN_SRC emacs-lisp
+  (use-package deft
+    :init
+    (setq deft-directory "~/Dropbox/Notes"
+          deft-default-extension "org"
+          deft-use-filename-as-title nil
+          deft-use-filter-string-for-filename t)
+    (defun jtdowney/deft ()
+      "Start deft already in evil insert mode"
+      (interactive)
+      (deft)
+      (evil-insert-state nil))
+    :general
+    (jtdowney/leader-define-key
+      "nv" #'jtdowney/deft
+      "nf" #'deft-find-file)
+    (jtdowney/local-leader-define-key deft-mode-map
+      "c" #'deft-filter-clear
+      "d" #'deft-delete-file
+      "i" #'deft-toggle-incremental-search
+      "n" #'deft-new-file
+      "r" #'deft-rename-file))
+#+END_SRC
+
+* Writing
+
+#+BEGIN_SRC emacs-lisp
+  (use-package writeroom-mode)
+#+END_SRC

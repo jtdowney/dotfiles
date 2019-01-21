@@ -1,0 +1,31 @@
+icons = "awesome"
+
+[theme]
+name = "slick"
+[theme.overrides]
+idle_bg = "#1D1F21"
+idle_fg = "#C5C8C6"
+info_bg = "#5F819D"
+info_fg = "#1D1F21"
+
+[[block]]
+block = "pacman"
+
+[[block]]
+block = "focused_window"
+
+[[block]]
+block = "music"
+marquee = true
+buttons = ["play", "next"]
+
+[[block]]
+block = "sound"
+
+[[block]]
+block = "load"
+
+[[block]]
+block = "time"
+interval = 60
+format = "%a %l:%M %P"

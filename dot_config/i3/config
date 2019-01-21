@@ -1,0 +1,125 @@
+# i3 config file (v4)
+
+set $mod Mod4
+font pango:Hack 10
+floating_modifier $mod
+focus_follows_mouse no
+
+bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Shift+q kill
+bindsym $mod+d exec rofi -show run
+bindsym $mod+space exec --no-startup-id j4-dmenu-desktop
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+bindsym $mod+s split h
+bindsym $mod+v split v
+bindsym $mod+f fullscreen toggle
+bindsym $mod+q layout stacking
+bindsym $mod+t layout tabbed
+bindsym $mod+e layout toggle split
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+semicolon focus mode_toggle
+bindsym $mod+a focus parent
+bindsym $mod+Shift+a focus child
+bindsym $mod+r mode "resize"
+bindsym $mod+Shift+x exec xset s activate
+bindsym $mod+o exec clipmenu
+bindsym $mod+p exec --no-startup-id rofi -show window
+bindsym $mod+g exec --no-startup-id rofi -show ssh
+
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws10
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws10
+
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+
+# Pulse Audio controls
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5% #increase sound volume
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5% #decrease sound volume
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle # mute sound
+
+# Media player controls
+bindsym XF86AudioPlay exec playerctl play-pause
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
+
+mode "resize" {
+    bindsym h resize shrink width 10 px or 10 ppt
+    bindsym j resize grow height 10 px or 10 ppt
+    bindsym k resize shrink height 10 px or 10 ppt
+    bindsym l resize grow width 10 px or 10 ppt
+
+    bindsym Left resize shrink width 10 px or 10 ppt
+    bindsym Down resize grow height 10 px or 10 ppt
+    bindsym Up resize shrink height 10 px or 10 ppt
+    bindsym Right resize grow width 10 px or 10 ppt
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+r mode "default"
+}
+
+client.focused          #C5C8C6 #1D1F21 #C5C8C6 #81A2BE   #81A2BE
+client.focused_inactive #C5C8C6 #1D1F21 #C5C8C6 #5F819D   #5F819D
+client.unfocused        #C5C8C6 #1D1F21 #C5C8C6 #5F819D   #5F819D
+client.urgent           #C5C8C6 #900000 #C5C8C6 #900000   #900000
+client.placeholder      #C5C8C6 #1D1F21 #C5C8C6 #5F819D   #5F819D
+client.background       #1D1F21
+
+bar {
+    font pango:Hack, FontAwesome 12
+    position top
+    status_command i3status-rs ~/.config/i3/status.toml
+
+    colors {
+        background #1D1F21
+        statusline #C5C8C6
+        separator  #81a2be
+
+        focused_workspace  #5F819D #5F819D #1D1F21
+        active_workspace   #51A2BE #81A2BE #1D1F21
+        inactive_workspace #81A2BE #81A2BE #1D1F21
+        urgent_workspace   #2F343A #900000 #FFFFFF
+        binding_mode       #2F343A #900000 #FFFFFF
+    }
+}
+
+exec_always alttab -w 1 -d 1
+for_window [class="^.*"] border pixel 2
+gaps inner 8
