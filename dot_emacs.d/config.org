@@ -376,7 +376,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (setq jtdowney/default-font "Hack"
-        jtdowney/default-font-size 12
+        jtdowney/default-font-size 13
         jtdowney/current-font-size jtdowney/default-font-size
         jtdowney/font-change-increment 1.1)
 
