@@ -787,7 +787,8 @@
               (goto-address-mode t)
               (general-define-key :keymap term-raw-map
                                   "s-v" #'jtdowney/term-paste)
-              (setq yas-dont-activate t)))
+              (setq yas-dont-activate t
+                    show-trailing-whitespace nil)))
   #+END_SRC
 
 * Programming environments
