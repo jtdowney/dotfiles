@@ -835,6 +835,12 @@
           show-paren-when-point-in-periphery t)
   #+END_SRC
 
+- Miscellaneous programming modes
+  #+BEGIN_SRC emacs-lisp
+    (use-package dockerfile-mode)
+    (use-package nginx-mode)
+  #+END_SRC
+
 ** Completion
 
 #+BEGIN_SRC emacs-lisp
