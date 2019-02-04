@@ -1,5 +1,4 @@
 export TERMINAL=alacritty
-xset r rate 250 30
 xset s 300 5
 numlockx on
 pasystray &
