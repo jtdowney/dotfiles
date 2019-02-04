@@ -220,6 +220,7 @@
       (evil-collection-init 'ivy)
       (setq enable-recursive-minibuffers t
             ivy-count-format "(%d/%d) "
+            ivy-on-del-error-function #'ignore
             ivy-re-builders-alist '((swiper . ivy--regex-plus)
                                     (t . ivy--regex-fuzzy))
             ivy-use-selectable-prompt t
@@ -254,7 +255,14 @@
         "ff" #'counsel-find-file
         "fr" #'counsel-recentf
         "ry" #'counsel-yank-pop
-        "sj" #'counsel-imenu))
+        "sj" #'counsel-imenu)
+      :config
+      (setq counsel-find-file-ignore-regexp
+            (concat
+             ;; File names beginning with # or .
+             "\\(?:\\`[#.]\\)"
+             ;; File names ending with # or ~
+             "\\|\\(?:\\`.+?[#~]\\'\\)")))
   #+END_SRC
 
 - Install =counsel-projectile=
