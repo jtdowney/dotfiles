@@ -1080,6 +1080,41 @@
     (push '(company-robe :with company-yasnippet) company-backends))
 #+END_SRC
 
+*** =rubocop=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rubocop
+    :hook (enh-ruby-mode . rubocop-mode)
+    :general
+    (jtdowney/local-leader-define-key enh-ruby-mode-map
+      "rrd" #'rubocop-check-directory
+      "rrD" #'rubocop-autocorrect-directory
+      "rrf" #'rubocop-check-current-file
+      "rrF" #'rubocop-autocorrect-current-file
+      "rrp" #'rubocop-check-project
+      "rrP" #'rubocop-autocorrect-project))
+#+END_SRC
+
+*** =rspec-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rspec-mode
+    :hook enh-ruby-mode
+    :general
+    (jtdowney/local-leader-define-key enh-ruby-mode-map
+      "ta"    #'rspec-verify-all
+      "tb"    #'rspec-verify
+      "tc"    #'rspec-verify-continue
+      "te"    #'rspec-toggle-example-pendingness
+      "tf"    #'rspec-verify-method
+      "tl"    #'rspec-run-last-failed
+      "tm"    #'rspec-verify-matching
+      "tr"    #'rspec-rerun
+      "tt"    #'rspec-verify-single
+      "t~"    #'rspec-toggle-spec-and-target-find-example
+      "t TAB" #'rspec-toggle-spec-and-target))
+#+END_SRC
+
 ** YAML
 
 #+BEGIN_SRC emacs-lisp
@@ -1450,6 +1485,12 @@
       "f" #'hindent-reformat-decl)
     :config
     (setq hindent-reformat-buffer-on-save t))
+#+END_SRC
+
+** Slim
+
+#+BEGIN_SRC emacs-lisp
+  (use-package slim-mode)
 #+END_SRC
 
 * Financial
