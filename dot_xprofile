@@ -6,5 +6,5 @@ blueman-applet &
 dropbox &
 nextcloud &
 redshift-gtk &
-xss-lock -- i3lock -c 1D1F21 &
+xss-lock -n /usr/lib/xsecurelock/dimmer -l -- xsecurelock &
 feh --bg-fill ~/.background.png &
