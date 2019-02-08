@@ -5,6 +5,11 @@
 
 * Basics
 
+- Load local config
+  #+BEGIN_SRC emacs-lisp
+    (load (concat user-emacs-directory "config-local.el"))
+  #+END_SRC
+
 - Bump up the GC threshold
   #+BEGIN_SRC emacs-lisp
     (setq gc-cons-threshold 20000000)
