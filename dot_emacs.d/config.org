@@ -1498,6 +1498,24 @@
   (use-package slim-mode)
 #+END_SRC
 
+** TypeScript
+*** =typescript-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package typescript-mode
+    :defer t)
+#+END_SRC
+
+*** =tide=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package tide
+    :after (typescript-mode company flycheck)
+    :hook ((typescript-mode . tide-setup)
+           (typescript-mode . tide-hl-identifier-mode)
+           (before-save . tide-format-before-save)))
+#+END_SRC
+
 * Financial
 
 #+BEGIN_SRC emacs-lisp
@@ -1559,4 +1577,10 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package writeroom-mode)
+#+END_SRC
+
+* Presentations
+
+#+BEGIN_SRC emacs-lisp
+  (use-package presentation)
 #+END_SRC
