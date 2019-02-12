@@ -9,10 +9,10 @@ info_bg = "#5F819D"
 info_fg = "#1D1F21"
 
 [[block]]
-block = "pacman"
+block = "focused_window"
 
 [[block]]
-block = "focused_window"
+block = "pacman"
 
 [[block]]
 block = "music"
