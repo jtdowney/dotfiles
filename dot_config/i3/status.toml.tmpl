@@ -25,6 +25,13 @@ block = "sound"
 [[block]]
 block = "load"
 
+{{ if eq .chezmoi.hostname "titan" -}}
+[[block]]
+block = "battery"
+upower = true
+format = "{percentage}% {time}"
+{{- end }}
+
 [[block]]
 block = "time"
 interval = 60
