@@ -1,21 +1,21 @@
 [user]
-    name = John Downey
-    email = jdowney@gmail.com
+	name = John Downey
+	email = jdowney@gmail.com
 [color]
-    ui = auto
+	ui = auto
 [alias]
-    ci = commit
-    co = checkout
-    st = status
-    staged = diff --cached
-    unstaged = diff
-    up = pull --rebase --autostash
+	ci = commit
+	co = checkout
+	st = status
+	staged = diff --cached
+	unstaged = diff
+	up = pull --rebase --autostash
 [push]
-    default = current
+	default = current
 [core]
-    autocrlf = input
+	autocrlf = input
 [rebase]
-    autosquash = true
-    autoStash = true
+	autosquash = true
+	autoStash = true
 [pull]
-    rebase = true
+	rebase = true
