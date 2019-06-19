@@ -227,6 +227,7 @@
             ivy-count-format "(%d/%d) "
             ivy-on-del-error-function #'ignore
             ivy-re-builders-alist '((swiper . ivy--regex-plus)
+                                    (counsel-rg . ivy--regex-plus)
                                     (t . ivy--regex-fuzzy))
             ivy-use-selectable-prompt t
             ivy-use-virtual-buffers t))
@@ -253,7 +254,7 @@
       :bind ("M-x" . counsel-M-x)
       :general
       (jtdowney/leader-define-key
-        "/" #'counsel-ag
+        "/" #'counsel-rg
         ":" #'counsel-M-x
         "?" #'counsel-descbinds
         "fL" #'counsel-locate
