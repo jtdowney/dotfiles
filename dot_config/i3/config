@@ -32,6 +32,7 @@ bindsym $mod+Shift+x exec xset s activate
 bindsym $mod+o exec clipmenu
 bindsym $mod+p exec --no-startup-id rofi -show window
 bindsym $mod+g exec --no-startup-id rofi -show ssh
+bindsym $mod+c exec --no-startup-id rofi -show calc -modi calc -no-show-match -no-sort
 
 set $ws1 "1"
 set $ws2 "2"
