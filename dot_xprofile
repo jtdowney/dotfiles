@@ -7,7 +7,7 @@ blueman-applet &
 dropbox &
 nextcloud &
 redshift-gtk &
-udiskie &
+udiskie --no-notify --tray &
 unclutter &
 xss-lock --ignore-sleep -- physlock &
 feh --bg-fill ~/.background.png &
