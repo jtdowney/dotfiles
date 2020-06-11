@@ -5,12 +5,13 @@ export EDITOR=vim
 export HISTSIZE=
 export HISTFILESIZE=
 
-alias git=hub
 eval "$(rbenv init -)"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
 [[ $- != *i* ]] && return
+
+alias git=hub
 
 {{ if eq .chezmoi.os "darwin" -}}
 alias ls='ls -G'
