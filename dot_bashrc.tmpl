@@ -2,16 +2,10 @@ export CODEPATH="$HOME/code"
 export GOPATH="$CODEPATH/go"
 export PATH="$HOME/.local/bin:$HOME/.rbenv/bin:$HOME/.pyenv/bin:$HOME/.cargo/bin:$GOPATH/bin:$PATH"
 export EDITOR=vim
-export LEDGER_FILE=$HOME/Nextcloud/Financial/ledger/main.txt
-export LEDGER_PRICE_DB=$HOME/Nextcloud/Financial/ledger/prices.txt
 export HISTSIZE=
 export HISTFILESIZE=
 
 alias git=hub
-alias ledger-bs="ledger bal \(assets or liabilities\)"
-alias ledger-cf="ledger bal assets"
-alias ledger-is="ledger bal --invert \(^income or ^expenses\)"
-
 eval "$(rbenv init -)"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
