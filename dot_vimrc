@@ -10,6 +10,7 @@ Plug 'janko-m/vim-test'
 Plug 'jlanzarotta/bufexplorer'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
+Plug 'mhinz/vim-mix-format'
 Plug 'nanotech/jellybeans.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'rust-lang/rust.vim'
@@ -98,6 +99,7 @@ let g:ale_completion_enabled = 1
 let g:ale_fix_on_save = 1
 let g:endwise_no_mappings = 1
 let g:ranger_map_keys = 0
+let g:mix_format_on_save = 1
 
 nmap <silent> <leader>fe :Ranger<CR>
 nmap <silent> <leader>ff :Files<CR>
