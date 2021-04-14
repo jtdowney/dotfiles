@@ -4,10 +4,7 @@ numlockx on
 pasystray &
 nm-applet &
 blueman-applet &
-dropbox &
 nextcloud &
-redshift-gtk &
 udiskie --no-notify --tray &
-unclutter &
 xss-lock --ignore-sleep -n dim-screen.sh -- i3lock -n -c 1d1f21 &
 feh --bg-fill ~/.background.png &
