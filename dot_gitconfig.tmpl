@@ -1,6 +1,6 @@
 [user]
 	name = John Downey
-	email = jdowney@gmail.com
+	email = {{ .email }}
 [color]
 	ui = auto
 [alias]
@@ -19,3 +19,10 @@
 	autoStash = true
 [pull]
 	rebase = true
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[init]
+	defaultBranch = main
