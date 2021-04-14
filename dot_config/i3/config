@@ -109,7 +109,7 @@ client.background       #1D1F21
 bar {
     font pango:Hack, FontAwesome 12
     position top
-    status_command i3status-rs ~/.config/i3/status.toml
+    status_command i3status-rs
 
     colors {
         background #1D1F21
