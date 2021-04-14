@@ -8,3 +8,4 @@ nextcloud &
 udiskie --no-notify --tray &
 xss-lock --ignore-sleep -n dim-screen.sh -- i3lock -n -c 1d1f21 &
 feh --bg-fill ~/.background.png &
+x11vnc -display $DISPLAY -auth ~/.Xauthority -rfbauth ~/.vnc/passwd -many &
