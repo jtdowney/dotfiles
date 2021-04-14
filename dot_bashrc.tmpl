@@ -5,26 +5,23 @@ export EDITOR=vim
 export HISTSIZE=
 export HISTFILESIZE=
 
-eval "$(rbenv init -)"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-
 [[ $- != *i* ]] && return
 
 alias git=hub
-
 {{ if eq .chezmoi.os "darwin" -}}
 alias ls='ls -G'
-{{ else -}}
-alias ls='ls --color=auto'
-{{ end -}}
-
-{{ if eq .chezmoi.os "darwin" -}}
+. /usr/local/opt/asdf/asdf.sh
 . $HOME/.fzf.bash
 [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
 {{ else -}}
+alias ls='ls --color=auto'
+. /opt/asdf-vm/asdf.sh
 . /usr/share/fzf/key-bindings.bash
 . /usr/share/fzf/completion.bash
+{{ end -}}
+
+{{ if eq .chezmoi.os "darwin" -}}
+{{ else -}}
 {{ end -}}
 
 eval "$(starship init bash)"
