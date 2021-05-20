@@ -28,8 +28,8 @@ block = "load"
 {{ if eq .chezmoi.hostname "titan" -}}
 [[block]]
 block = "battery"
-upower = true
-format = "{percentage}% {time}"
+driver = "upower"
+format = "{percentage} {time}"
 {{- end }}
 
 [[block]]
