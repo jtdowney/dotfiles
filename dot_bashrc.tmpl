@@ -9,11 +9,13 @@ export HISTFILESIZE=
 
 alias git=hub
 {{ if eq .chezmoi.os "darwin" -}}
-alias ls='ls -G'
+eval $(gdircolors ~/.dir_colors)
+alias ls='gls --color=auto'
 . /usr/local/opt/asdf/asdf.sh
 . $HOME/.fzf.bash
 [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
 {{ else -}}
+eval $(dircolors ~/.dir_colors)
 alias ls='ls --color=auto'
 . /opt/asdf-vm/asdf.sh
 . /usr/share/fzf/key-bindings.bash
