@@ -1,3 +1,4 @@
+export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --no-ignore-vcs"
 export CODEPATH="$HOME/code"
 export GOPATH="$CODEPATH/go"
 {{ if (and (eq .chezmoi.os "darwin") (eq .chezmoi.arch "arm64")) -}}
