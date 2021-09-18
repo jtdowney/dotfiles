@@ -11,7 +11,6 @@ export HISTFILESIZE=
 
 [[ $- != *i* ]] && return
 
-alias git=hub
 {{ if eq .chezmoi.os "darwin" -}}
 eval $(gdircolors ~/.dir_colors)
 alias ls='gls --color=auto'
