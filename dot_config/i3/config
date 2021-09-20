@@ -28,7 +28,7 @@ bindsym $mod+semicolon focus mode_toggle
 bindsym $mod+a focus parent
 bindsym $mod+Shift+a focus child
 bindsym $mod+r mode "resize"
-bindsym $mod+Shift+x exec xset s activate
+bindsym $mod+Shift+x exec loginctl lock-session
 bindsym $mod+o exec clipmenu
 bindsym $mod+p exec --no-startup-id rofi -show window
 bindsym $mod+g exec --no-startup-id rofi -show ssh
