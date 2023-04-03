@@ -16,8 +16,7 @@ block = "pacman"
 
 [[block]]
 block = "music"
-marquee = true
-buttons = ["play", "next"]
+#buttons = ["play", "next"]
 
 [[block]]
 block = "sound"
@@ -35,4 +34,4 @@ format = "{percentage} {time}"
 [[block]]
 block = "time"
 interval = 60
-format = "%a %l:%M %P"
+format = " $icon $timestamp.datetime(f:'%a %l:%M %P')"

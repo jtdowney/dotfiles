@@ -1,7 +1,7 @@
 # i3 config file (v4)
 
 set $mod Mod4
-font pango:JetBrains Mono 10
+font pango:Berkeley Mono 10
 floating_modifier $mod
 focus_follows_mouse no
 
@@ -107,7 +107,7 @@ client.urgent           #C5C8C6 #900000 #C5C8C6 #900000 #900000
 client.background       #1D1F21
 
 bar {
-    font pango:JetBrains Mono, FontAwesome 12
+    font pango:Berkeley Mono, FontAwesome 12
     position top
     status_command i3status-rs
 

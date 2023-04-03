@@ -70,17 +70,17 @@ scrolling:
 font:
   # Normal (roman) font face
   normal:
-    family: JetBrains Mono
+    family: monospace
     style: Regular
 
   # Bold font face
   bold:
-    family: JetBrains Mono
+    family: monospace
     style: Bold
 
   # Italic font face
   italic:
-    family: JetBrains Mono
+    family: monospace
     style: Italic
 
   # Point size
