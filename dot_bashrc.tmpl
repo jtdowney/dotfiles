@@ -1,7 +1,7 @@
 export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --no-ignore-vcs"
 export CODEPATH="$HOME/code"
 export GOPATH="$CODEPATH/go"
-{{ if (and (eq .chezmoi.os "darwin") (eq .chezmoi.arch "arm64")) -}}
+{{ if (eq .chezmoi.os "darwin") -}}
 export PATH="/opt/homebrew/bin:$PATH"
 {{ end -}}
 export PATH="$HOME/.local/bin:$HOME/.rbenv/bin:$HOME/.pyenv/bin:$HOME/.cargo/bin:$GOPATH/bin:$PATH"
@@ -19,19 +19,9 @@ export PROMPT_COMMAND="history -a; history -n; ${PROMPT_COMMAND}"
 [[ $- != *i* ]] && return
 
 {{ if eq .chezmoi.os "darwin" -}}
-eval $(gdircolors ~/.dir_colors)
-alias ls='gls --color=auto'
-{{ if (eq .chezmoi.arch "arm64") -}}
-. /opt/homebrew/opt/asdf/asdf.sh
-{{ else -}}
-. /usr/local/opt/asdf/asdf.sh
-{{ end -}}
 . $HOME/.fzf.bash
-[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+[[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] && . "/opt/homebrew/etc/profile.d/bash_completion.sh"
 {{ else -}}
-eval $(dircolors ~/.dir_colors)
-alias ls='ls --color=auto'
-. /opt/asdf-vm/asdf.sh
 . /usr/share/fzf/key-bindings.bash
 . /usr/share/fzf/completion.bash
 {{ end -}}
