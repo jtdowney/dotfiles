@@ -18,6 +18,8 @@ export PROMPT_COMMAND="history -a; history -n; ${PROMPT_COMMAND}"
 
 [[ $- != *i* ]] && return
 
+alias ls=exa
+
 {{ if eq .chezmoi.os "darwin" -}}
 . $HOME/.fzf.bash
 [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] && . "/opt/homebrew/etc/profile.d/bash_completion.sh"
