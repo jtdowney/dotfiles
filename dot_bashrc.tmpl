@@ -30,7 +30,8 @@ alias ls=exa
 {{ end -}}
 
 eval "$(starship init bash)"
-eval "$(rtx activate -q -s bash)"
+eval "$(mise activate -q -s bash)"
+eval "$(zoxide init bash)"
 
 bind '"\C-r": "\C-a hstr -- \C-j"'
 bind '"\C-xk": "\C-a hstr -k \C-j"'
