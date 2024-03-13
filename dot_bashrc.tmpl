@@ -5,6 +5,7 @@ export GOPATH="$CODEPATH/go"
 export PATH="/opt/homebrew/bin:$PATH"
 {{ end -}}
 export PATH="$HOME/.local/bin:$HOME/.rbenv/bin:$HOME/.pyenv/bin:$HOME/.cargo/bin:$GOPATH/bin:$PATH"
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export EDITOR=vim
 
 alias hh=hstr                    # hh to be alias for hstr
