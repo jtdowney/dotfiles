@@ -19,6 +19,8 @@
 	autoStash = true
 [pull]
 	rebase = true
+[fetch]
+	writeCommitGraph = true
 [filter "lfs"]
 	required = true
 	clean = git-lfs clean -- %f
@@ -26,17 +28,15 @@
 	process = git-lfs filter-process
 [init]
 	defaultBranch = main
+[diff]
+	tool = difftastic
+	external = difft
+[difftool]
+	prompt = false
+[difftool "difftastic"]
+	cmd = difft "$LOCAL" "$REMOTE"
 [pager]
-  diff = delta
-  log = delta
-  reflog = delta
-  show = delta
-[interactive]
-  diffFilter = delta --color-only
-[delta]
-  features = side-by-side line-numbers decorations
-  whitespace-error-style = 22 reverse
-[delta "decorations"]
-  commit-decoration-style = bold yellow box ul
-  file-style = bold yellow ul
-  file-decoration-style = none
+	difftool = true
+[rerere]
+	enabled = true
+	autoUpdate = true
