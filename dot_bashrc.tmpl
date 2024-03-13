@@ -19,8 +19,6 @@ export PROMPT_COMMAND="history -a; history -n; ${PROMPT_COMMAND}"
 
 [[ $- != *i* ]] && return
 
-alias ls=exa
-
 {{ if eq .chezmoi.os "darwin" -}}
 . $HOME/.fzf.bash
 [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] && . "/opt/homebrew/etc/profile.d/bash_completion.sh"
@@ -32,6 +30,11 @@ alias ls=exa
 eval "$(starship init bash)"
 eval "$(mise activate -q -s bash)"
 eval "$(zoxide init bash)"
+
+alias ls=eza
+alias k=kubectl
+alias cd=z
+alias assume="source assume"
 
 bind '"\C-r": "\C-a hstr -- \C-j"'
 bind '"\C-xk": "\C-a hstr -k \C-j"'
