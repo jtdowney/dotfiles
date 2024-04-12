@@ -1,0 +1,6 @@
+[window]
+option_as_alt = "Both"
+
+[font]
+normal = { family = "Berkeley Mono" }
+size = 14
