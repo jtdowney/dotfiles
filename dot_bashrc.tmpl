@@ -6,7 +6,7 @@ export PATH="/opt/homebrew/bin:$PATH"
 {{ end -}}
 export PATH="$HOME/.local/bin:$HOME/.rbenv/bin:$HOME/.pyenv/bin:$HOME/.cargo/bin:$GOPATH/bin:$PATH"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-export EDITOR=vim
+export EDITOR=nvim
 
 alias hh=hstr                    # hh to be alias for hstr
 export HSTR_CONFIG=hicolor       # get more colors
@@ -35,6 +35,7 @@ alias ls=eza
 alias k=kubectl
 alias cd=z
 alias assume="source assume"
+alias vim=nvim
 
 bind '"\C-r": "\C-a hstr -- \C-j"'
 bind '"\C-xk": "\C-a hstr -k \C-j"'
