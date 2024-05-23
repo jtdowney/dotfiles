@@ -36,6 +36,9 @@ alias k=kubectl
 alias cd=z
 alias assume="source assume"
 alias vim=nvim
+{{ if (eq .chezmoi.os "darwin") -}}
+alias tailscale=/Applications/Tailscale.app/Contents/MacOS/Tailscale
+{{ end -}}
 
 bind '"\C-r": "\C-a hstr -- \C-j"'
 bind '"\C-xk": "\C-a hstr -k \C-j"'
