@@ -1,8 +1,9 @@
 return {
   "catppuccin/nvim",
   name = "catppuccin",
+  ---@type CatppuccinOptions
   opts = {
     flavor = "frappe",
-    transpaent_background = true,
+    transparent_background = true,
   },
 }
