@@ -9,7 +9,7 @@ config.colors = {
 config.font = wezterm.font(
 	"BerkeleyMono Nerd Font Mono Plus Font Awesome Plus Font Awesome Extension Plus Octicons Plus Power Symbols Plus Codicons Plus Pomicons Plus Font Logos Plus Material Design Icons Plus Weather Icons"
 )
-config.font_size = 14
+config.font_size = 16
 config.audible_bell = "Disabled"
 
 return config
