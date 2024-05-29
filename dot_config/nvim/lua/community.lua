@@ -24,6 +24,5 @@ return {
   { import = "astrocommunity.pack.toml" },
   { import = "astrocommunity.pack.typescript" },
   { import = "astrocommunity.search.sad-nvim" },
-  { import = "astrocommunity.snippet.nvim-snippets" },
   { import = "astrocommunity.test.neotest" },
 }
