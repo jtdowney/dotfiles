@@ -12,6 +12,7 @@ return {
       opt = {
         relativenumber = false,
         number = true,
+        colorcolumn = "80",
       },
     },
     mappings = {
