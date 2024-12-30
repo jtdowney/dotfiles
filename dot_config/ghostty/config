@@ -1,0 +1,7 @@
+font-family = "TX-02"
+font-size = 16
+theme = "Dracula+"
+cursor-color = "#ff79c6" 
+cursor-style-blink = true
+shell-integration-features = no-cursor
+window-new-tab-position = end
