@@ -1,7 +1,12 @@
-font-family = "TX-02"
-font-size = 16
-theme = "Dracula+"
 cursor-color = "#ff79c6" 
 cursor-style-blink = true
+font-family = "TX-02"
+font-feature = -calt
+font-feature = -dlig
+font-feature = -liga
+font-size = 16
+font-thicken = true
+macos-titlebar-proxy-icon = hidden
 shell-integration-features = no-cursor
+theme = "IR_Black"
 window-new-tab-position = end
