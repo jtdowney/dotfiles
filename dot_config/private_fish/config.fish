@@ -11,7 +11,6 @@ alias k=kubectl
 alias ls=eza
 alias vim=nvim
 alias tailscale=/Applications/Tailscale.app/Contents/MacOS/Tailscale
-alias npm=pnpm
 
 function y
 	set tmp (mktemp -t "yazi-cwd.XXXXXX")
