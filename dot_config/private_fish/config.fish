@@ -2,6 +2,7 @@ set -g fish_greeting
 set -x CODEPATH $HOME/code
 set -x GOPATH $CODEPATH/go
 set -x PATH /opt/homebrew/bin /opt/homebrew/opt/postgresql@17/bin $GOPATH/bin $HOME/.krew/bin $PATH
+set -x EDITOR nvim
 
 alias assume="source assume"
 alias cat=bat
