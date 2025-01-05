@@ -1,16 +1,21 @@
 set -g fish_greeting
 set -x CODEPATH $HOME/code
 set -x GOPATH $CODEPATH/go
-set -x PATH /opt/homebrew/bin /opt/homebrew/opt/postgresql@17/bin $GOPATH/bin $HOME/.krew/bin $HOME/.cargo/bin $PATH
+set -x PATH $GOPATH/bin $HOME/.krew/bin $HOME/.cargo/bin $PATH
+{{ if (eq .chezmoi.os "darwin") -}}
+set -x PATH /opt/homebrew/opt/postgresql@17/bin /opt/homebrew/bin $PATH
+{{ end -}}
 set -x EDITOR nvim
 
 alias assume="source assume"
 alias cat=bat
-alias cd=z
 alias k=kubectl
 alias ls=eza
 alias vim=nvim
+{{ if (eq .chezmoi.os "darwin") -}}
 alias tailscale=/Applications/Tailscale.app/Contents/MacOS/Tailscale
+alias cd=z
+{{ end -}}
 
 function y
 	set tmp (mktemp -t "yazi-cwd.XXXXXX")
