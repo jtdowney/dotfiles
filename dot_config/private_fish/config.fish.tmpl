@@ -7,16 +7,6 @@ set -x PATH /opt/homebrew/opt/postgresql@17/bin /opt/homebrew/bin $PATH
 {{ end -}}
 set -x EDITOR nvim
 
-alias assume="source assume"
-alias cat=bat
-alias k=kubectl
-alias ls=eza
-alias vim=nvim
-{{ if (eq .chezmoi.os "darwin") -}}
-alias tailscale=/Applications/Tailscale.app/Contents/MacOS/Tailscale
-alias cd=z
-{{ end -}}
-
 function y
 	set tmp (mktemp -t "yazi-cwd.XXXXXX")
 	yazi $argv --cwd-file="$tmp"
@@ -27,6 +17,16 @@ function y
 end
 
 if status is-interactive
+  alias assume="source assume"
+  alias cat=bat
+  alias k=kubectl
+  alias ls=eza
+  alias vim=nvim
+  {{ if (eq .chezmoi.os "darwin") -}}
+  alias tailscale=/Applications/Tailscale.app/Contents/MacOS/Tailscale
+  alias cd=z
+  {{ end }}
+
   starship init fish | source
   mise activate fish | source
   zoxide init fish | source
