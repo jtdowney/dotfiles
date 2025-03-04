@@ -7,8 +7,13 @@ set -x PATH /opt/homebrew/opt/postgresql@17/bin /opt/homebrew/bin $PATH
 {{ end -}}
 set -x EDITOR nvim
 
+function t -a name
+	set tmp (mktemp -d -t "$name")
+	pushd "$tmp"
+end
+
 function y
-	set tmp (mktemp -t "yazi-cwd.XXXXXX")
+	set tmp (mktemp -t yazi-cwd)
 	yazi $argv --cwd-file="$tmp"
 	if set cwd (command cat -- "$tmp"); and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
 		builtin cd -- "$cwd"
