@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "true"
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash(cargo clippy:*)",
+      "Bash(cargo fmt:*)",
+      "Bash(cargo info:*)",
+      "Bash(cargo nextest:*)",
+      "Bash(cargo search:*)",
+      "Bash(find:*)",
+      "Bash(gh pr view:*)",
+      "Bash(git describe:*)",
+      "Bash(git log:*)",
+      "Bash(go doc:*)",
+      "Bash(go fmt:*)",
+      "Bash(go mod:*)",
+      "Bash(go test:*)",
+      "Bash(go vet:*)",
+      "Bash(gofmt:*)",
+      "Bash(golangci-lint run:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(mix format:*)",
+      "Bash(mix test:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm run lint:*)",
+      "Bash(rg:*)",
+      "Glob",
+      "Grep",
+      "LS",
+      "Read",
+      "Task",
+      "WebFetch(domain:docs.docker.com)",
+      "WebFetch(domain:github.com)",
+      "mcp__context7__get-library-docs",
+      "mcp__context7__resolve-library-id",
+      "mcp__deepwiki__deepwiki_fetch",
+      "mcp__zen__challenge",
+      "mcp__zen__chat",
+      "mcp__zen__debug",
+      "mcp__zen__precommit",
+      "mcp__zen__thinkdeep"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bunx ccusage statusline"
+  },
+  "feedbackSurveyState": {
+    "lastShownTime": 1754077728582
+  }
+}
