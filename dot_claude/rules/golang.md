@@ -1,6 +1,6 @@
 ---
-globs: "*.go"
-alwaysApply: false
+paths:
+  - "**/*.go"
 ---
 
 # Go

@@ -1,6 +1,6 @@
 ---
-globs: "*.ex, *.exs"
-alwaysApply: false
+paths:
+  - "**/*.ex{,s}"
 ---
 
 # Elixir

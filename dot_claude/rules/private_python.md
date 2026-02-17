@@ -1,6 +1,6 @@
 ---
-globs: "*.py"
-alwaysApply: false
+paths:
+  - "**/*.py"
 ---
 
 # Python

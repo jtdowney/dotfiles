@@ -1,6 +1,7 @@
 ---
-globs: "*.rs, Cargo.toml"
-alwaysApply: false
+paths: 
+  - "**/*.rs"
+  - "**/Cargo.toml"
 ---
 
 # Rust

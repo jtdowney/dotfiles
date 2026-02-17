@@ -1,6 +1,7 @@
 ---
-globs: "*.gleam, gleam.toml"
-alwaysApply: false
+paths:
+  - "**/*.gleam"
+  - "**/gleam.toml"
 ---
 
 # Gleam
