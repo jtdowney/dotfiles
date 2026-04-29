@@ -8,8 +8,7 @@
 return {
   "AstroNvim/astrocommunity",
   { import = "astrocommunity.pack.lua" },
-  { import = "astrocommunity.completion.avante-nvim" },
-  { import = "astrocommunity.completion.copilot-lua-cmp" },
+  { import = "astrocommunity.ai.avante-nvim" },
   { import = "astrocommunity.diagnostics.trouble-nvim" },
   { import = "astrocommunity.editing-support.multiple-cursors-nvim" },
   { import = "astrocommunity.file-explorer.oil-nvim" },
@@ -33,5 +32,4 @@ return {
   { import = "astrocommunity.scrolling.nvim-scrollbar" },
   { import = "astrocommunity.search.sad-nvim" },
   { import = "astrocommunity.test.neotest" },
-  -- import/override with your plugins folder
 }
